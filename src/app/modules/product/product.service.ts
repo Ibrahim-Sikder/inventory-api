@@ -1,6 +1,8 @@
 import httpStatus from 'http-status';
+import { UploadApiResponse } from 'cloudinary';
 import { AppError } from '../../error/AppError';
 import QueryBuilder from '../../builder/QueryBuilder';
+import { sendImageToCloudinary } from '../../../utils/sendImageToCloudinary';
 import { PRODUCT_SEARCHABLE_FIELDS, LOW_STOCK_THRESHOLD } from './product.constant';
 import { TProduct } from './product.interface';
 import { Product } from './product.model';
@@ -11,11 +13,19 @@ const createProduct = async (payload: TProduct) => {
         throw new AppError(httpStatus.BAD_REQUEST, 'SKU already exists!');
     }
 
-    if (!payload.image) {
-        throw new AppError(httpStatus.BAD_REQUEST, 'Product image is required!');
-    }
+    const imageName = `${payload.sku}-${Date.now()}`;
+    const uploadResult = (await sendImageToCloudinary(
+        imageName,
+        file.path,
+        'products',
+    )) as UploadApiResponse;
 
-    return Product.create(payload);
+    const productPayload: TProduct = {
+        ...payload,
+        image: uploadResult.secure_url,
+    };
+
+    return Product.create(productPayload);
 };
 
 const getAllProducts = async (query: Record<string, unknown>) => {
@@ -43,7 +53,11 @@ const getSingleProduct = async (id: string) => {
     return result;
 };
 
-const updateProduct = async (id: string, payload: Partial<TProduct>) => {
+const updateProduct = async (
+    id: string,
+    payload: Partial<TProduct>,
+    file?: Express.Multer.File,
+) => {
     if (payload.sku) {
         const existingSku = await Product.findOne({
             sku: payload.sku,
@@ -54,9 +68,23 @@ const updateProduct = async (id: string, payload: Partial<TProduct>) => {
         }
     }
 
+    const updatePayload: Partial<TProduct> = { ...payload };
+
+    // Image is optional on update — only touch Cloudinary if a new file came in.
+    if (file) {
+        const imageName = `${payload.sku ?? id}-${Date.now()}`;
+        const uploadResult = (await sendImageToCloudinary(
+            imageName,
+            file.path,
+            'products',
+        )) as UploadApiResponse;
+
+        updatePayload.image = uploadResult.secure_url;
+    }
+
     const result = await Product.findOneAndUpdate(
         { _id: id, isDeleted: false },
-        payload,
+        updatePayload,
         { new: true, runValidators: true },
     );
 

@@ -34,7 +34,5 @@ const productSchema = new Schema<TProduct>(
     { timestamps: true },
 );
 
-// Note: isDeleted:false filtering is applied explicitly in product.service.ts
-// (kept out of a global pre-hook so it composes predictably with QueryBuilder).
 
 export const Product = model<TProduct>('Product', productSchema);

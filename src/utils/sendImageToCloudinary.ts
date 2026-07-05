@@ -20,7 +20,7 @@ export const sendImageToCloudinary = (
       path,
       {
         public_id: imageName.trim(),
-        folder: `news/${folder}`,
+        folder: `inventory/${folder}`,
       },
       function (error, result) {
         if (error) {
@@ -29,7 +29,7 @@ export const sendImageToCloudinary = (
         if (result) {
           resolve(result);
         }
-        
+
         // Asynchronously delete the file after upload
         fs.unlink(path, (err) => {
           if (err) {

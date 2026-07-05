@@ -33,7 +33,7 @@ export const auth = (...requiredRoles: TUserRole[]) => {
     }
 
     const { userId, role } = decoded;
-    console.log(decoded);
+
 
     // Use findById instead of findOne with userId field
     const user = await User.findOne({ userId });

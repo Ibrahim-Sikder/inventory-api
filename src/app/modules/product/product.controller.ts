@@ -1,20 +1,13 @@
 import httpStatus from 'http-status';
-import { AppError } from '../../error/AppError';
 import { ProductServices } from './product.service';
 import { catchAsync } from '../../../utils/catchAsync';
 import sendResponse from '../../../utils/sendResponse';
 
+
+
 const createProduct = catchAsync(async (req, res) => {
-    if (!req.file) {
-        throw new AppError(httpStatus.BAD_REQUEST, 'Product image is required!');
-    }
 
-    const payload = {
-        ...req.body,
-        image: `/uploads/products/${req.file.filename}`,
-    };
-
-    const result = await ProductServices.createProduct(payload);
+    const result = await ProductServices.createProduct(req.body);
 
     sendResponse(res, {
         statusCode: httpStatus.CREATED,
@@ -48,12 +41,8 @@ const getSingleProduct = catchAsync(async (req, res) => {
 });
 
 const updateProduct = catchAsync(async (req, res) => {
-    const payload = { ...req.body };
-    if (req.file) {
-        payload.image = `/uploads/products/${req.file.filename}`;
-    }
 
-    const result = await ProductServices.updateProduct(req.params.id, payload);
+    const result = await ProductServices.updateProduct(req.params.id, req.body);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
