@@ -8,11 +8,10 @@ import { USER_ROLE } from '../user/user.constant';
 
 const router = express.Router();
 
-// Admin: full access | Manager: manage products | Employee: view only
 router.post(
     '/',
     auth(USER_ROLE.admin, USER_ROLE.manager),
-    upload, // multer -> local tmp file -> service uploads it to Cloudinary
+    upload,
     validateRequest(ProductValidation.createProductValidationSchema),
     ProductController.createProduct,
 );

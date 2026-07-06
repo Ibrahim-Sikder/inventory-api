@@ -6,8 +6,14 @@ import sendResponse from '../../../utils/sendResponse';
 
 
 const createProduct = catchAsync(async (req, res) => {
+    console.log('req.files:', req.files);
+    console.log('req.body:', req.body);
 
-    const result = await ProductServices.createProduct(req.body);
+    // Pass files array to service
+    const result = await ProductServices.createProduct(
+        req.body,
+        req.files as Express.Multer.File[]
+    );
 
     sendResponse(res, {
         statusCode: httpStatus.CREATED,
@@ -40,9 +46,15 @@ const getSingleProduct = catchAsync(async (req, res) => {
     });
 });
 
-const updateProduct = catchAsync(async (req, res) => {
 
-    const result = await ProductServices.updateProduct(req.params.id, req.body);
+
+// Update Product Controller
+const updateProduct = catchAsync(async (req, res) => {
+    const result = await ProductServices.updateProduct(
+        req.params.id,
+        req.body,
+        req.files as Express.Multer.File[] // Pass files array
+    );
 
     sendResponse(res, {
         statusCode: httpStatus.OK,

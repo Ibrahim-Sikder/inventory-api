@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { TProduct } from './product.interface';
+import { type } from 'os';
 
 const productSchema = new Schema<TProduct>(
     {
@@ -28,7 +29,7 @@ const productSchema = new Schema<TProduct>(
             min: [0, 'Stock quantity cannot be negative'],
             default: 0,
         },
-        image: { type: String, required: [true, 'Product image is required'] },
+        images: { type: [String], required: [true, 'Product images are required'] },
         isDeleted: { type: Boolean, default: false },
     },
     { timestamps: true },

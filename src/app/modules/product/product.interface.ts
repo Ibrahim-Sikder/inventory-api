@@ -6,6 +6,6 @@ export type TProduct = {
     purchasePrice: number;
     sellingPrice: number;
     stockQuantity: number;
-    image: string; // stored file path / URL
+    images: [string];
     isDeleted: boolean;
 };
