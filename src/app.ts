@@ -50,7 +50,7 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(cookieParser());
 
 const allowedOrigins = [
-  'http://localhost:3001',
+  'http://localhost:3000',
 ];
 
 app.use(

@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.post(
     '/',
-    auth(USER_ROLE.admin, USER_ROLE.manager),
+    auth('admin', 'manager', 'employee'),
     upload,
     validateRequest(ProductValidation.createProductValidationSchema),
     ProductController.createProduct,
@@ -18,19 +18,19 @@ router.post(
 
 router.get(
     '/',
-    auth(USER_ROLE.admin, USER_ROLE.manager, USER_ROLE.employee),
+    auth('admin', 'manager', 'employee'),
     ProductController.getAllProducts,
 );
 
 router.get(
     '/:id',
-    auth(USER_ROLE.admin, USER_ROLE.manager, USER_ROLE.employee),
+    auth('admin', 'manager', 'employee'),
     ProductController.getSingleProduct,
 );
 
 router.patch(
     '/:id',
-    auth(USER_ROLE.admin, USER_ROLE.manager),
+    auth('admin', 'manager', 'employee'),
     upload,
     validateRequest(ProductValidation.updateProductValidationSchema),
     ProductController.updateProduct,
@@ -38,7 +38,7 @@ router.patch(
 
 router.delete(
     '/:id',
-    auth(USER_ROLE.admin, USER_ROLE.manager),
+    auth('admin', 'manager', 'employee'),
     ProductController.deleteProduct,
 );
 

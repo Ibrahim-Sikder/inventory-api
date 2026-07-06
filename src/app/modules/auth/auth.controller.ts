@@ -5,17 +5,27 @@ import { TJwtPayload } from './auth.utils';
 import { catchAsync } from '../../../utils/catchAsync';
 import sendResponse from '../../../utils/sendResponse';
 
-const cookieOptions = {
-  secure: config.NODE_ENV === 'production',
+const isProd = config.NODE_ENV === 'production';
+
+const accessTokenCookieOptions = {
   httpOnly: true,
-  sameSite: 'none' as const,
+  secure: isProd,
+  sameSite: (isProd ? 'none' : 'lax') as 'none' | 'lax',
+  maxAge: 1000 * 60 * 60,
+};
+
+const refreshTokenCookieOptions = {
+  httpOnly: true,
+  secure: isProd,
+  sameSite: (isProd ? 'none' : 'lax') as 'none' | 'lax',
+  maxAge: 1000 * 60 * 60 * 24 * 7,
 };
 
 const registerUser = catchAsync(async (req, res) => {
   const result = await AuthServices.registerUser(req.body);
   const { refreshToken, accessToken, user } = result;
 
-  res.cookie('refreshToken', refreshToken, cookieOptions);
+  res.cookie('refreshToken', refreshToken, refreshTokenCookieOptions);
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -29,8 +39,8 @@ const loginUser = catchAsync(async (req, res) => {
   const result = await AuthServices.loginUser(req.body);
   const { refreshToken, accessToken, user } = result;
 
-  res.cookie('refreshToken', refreshToken, cookieOptions);
-  res.cookie('accessToken', accessToken, cookieOptions);
+  res.cookie('refreshToken', refreshToken, refreshTokenCookieOptions);
+  res.cookie('accessToken', accessToken, accessTokenCookieOptions);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -44,7 +54,7 @@ const refreshToken = catchAsync(async (req, res) => {
   const token = req.cookies?.refreshToken || req.body.refreshToken;
   const result = await AuthServices.refreshToken(token);
 
-  res.cookie('accessToken', result.accessToken, cookieOptions);
+  res.cookie('accessToken', result.accessToken, accessTokenCookieOptions);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -55,8 +65,8 @@ const refreshToken = catchAsync(async (req, res) => {
 });
 
 const logoutUser = catchAsync(async (_req, res) => {
-  res.clearCookie('accessToken', cookieOptions);
-  res.clearCookie('refreshToken', cookieOptions);
+  res.clearCookie('accessToken', accessTokenCookieOptions);
+  res.clearCookie('refreshToken', refreshTokenCookieOptions);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -67,11 +77,7 @@ const logoutUser = catchAsync(async (_req, res) => {
 });
 
 const changePassword = catchAsync(async (req, res) => {
-  const result = await AuthServices.changePassword(
-    req.user as TJwtPayload,
-    req.body,
-  );
-
+  const result = await AuthServices.changePassword(req.user as TJwtPayload, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -82,7 +88,6 @@ const changePassword = catchAsync(async (req, res) => {
 
 const getMe = catchAsync(async (req, res) => {
   const result = await AuthServices.getMe(req.user as TJwtPayload);
-
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

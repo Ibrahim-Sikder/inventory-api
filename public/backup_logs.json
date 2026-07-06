@@ -16,5 +16,14 @@
     "backupStartTime": "2026-07-05T18:00:00.930Z",
     "backupEndTime": "2026-07-05T18:00:00.964Z",
     "archivePath": "/home/ibrahim-sikder/project/personal/interview/backend/public/sarabelanews.gzip"
+  },
+  {
+    "status": "failed",
+    "error": "Command failed: mongodump --db=ERP --archive=/home/ibrahim-sikder/project/personal/interview/backend/public/sarabelanews.gzip --gzip\n/bin/sh: 1: mongodump: not found\n",
+    "code": null,
+    "signal": null,
+    "backupStartTime": "2026-07-06T18:00:00.772Z",
+    "backupEndTime": "2026-07-06T18:00:00.805Z",
+    "archivePath": "/home/ibrahim-sikder/project/personal/interview/backend/public/sarabelanews.gzip"
   }
 ]
