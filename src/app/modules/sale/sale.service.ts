@@ -6,8 +6,6 @@ import { Product } from '../product/product.model';
 import { Customer } from '../customer/customer.model';
 import { TCreateSalePayload, TSaleItem } from './sale.interface';
 import { Sale } from './sale.model';
-
-
 const createSale = async (payload: TCreateSalePayload, createdBy: string) => {
     const customer = await Customer.findOne({
         _id: payload.customer,
@@ -18,71 +16,72 @@ const createSale = async (payload: TCreateSalePayload, createdBy: string) => {
     }
 
     const session = await mongoose.startSession();
+    let created;
 
     try {
-        session.startTransaction();
+        await session.withTransaction(async () => {
+            const saleItems: TSaleItem[] = [];
+            let grandTotal = 0;
 
-        const saleItems: TSaleItem[] = [];
-        let grandTotal = 0;
+            for (const item of payload.items) {
+                const product = await Product.findOne({
+                    _id: item.product,
+                    isDeleted: false,
+                }).session(session);
 
-        for (const item of payload.items) {
-            const product = await Product.findOne({
-                _id: item.product,
-                isDeleted: false,
-            }).session(session);
+                if (!product) {
+                    throw new AppError(
+                        httpStatus.NOT_FOUND,
+                        `Product not found: ${item.product}`,
+                    );
+                }
 
-            if (!product) {
-                throw new AppError(
-                    httpStatus.NOT_FOUND,
-                    `Product not found: ${item.product}`,
+                if (product.stockQuantity < item.quantity) {
+                    throw new AppError(
+                        httpStatus.BAD_REQUEST,
+                        `Insufficient stock for "${product.name}". Available: ${product.stockQuantity}, Requested: ${item.quantity}`,
+                    );
+                }
+
+                const subtotal = product.sellingPrice * item.quantity;
+                grandTotal += subtotal;
+
+                saleItems.push({
+                    product: product._id!,
+                    quantity: item.quantity,
+                    unitPrice: product.sellingPrice,
+                    subtotal,
+                });
+
+                const updated = await Product.findOneAndUpdate(
+                    { _id: product._id, stockQuantity: { $gte: item.quantity } },
+                    { $inc: { stockQuantity: -item.quantity } },
+                    { new: true, session },
                 );
+
+                if (!updated) {
+                    throw new AppError(
+                        httpStatus.BAD_REQUEST,
+                        `Insufficient stock for "${product.name}" (stock changed concurrently)`,
+                    );
+                }
             }
 
-            if (product.stockQuantity < item.quantity) {
-                throw new AppError(
-                    httpStatus.BAD_REQUEST,
-                    `Insufficient stock for "${product.name}". Available: ${product.stockQuantity}, Requested: ${item.quantity}`,
-                );
-            }
-
-            const subtotal = product.sellingPrice * item.quantity;
-            grandTotal += subtotal;
-
-            saleItems.push({
-                product: product._id!.toString(),
-                quantity: item.quantity,
-                unitPrice: product.sellingPrice,
-                subtotal,
-            });
-
-
-            const updated = await Product.findOneAndUpdate(
-                { _id: product._id, stockQuantity: { $gte: item.quantity } },
-                { $inc: { stockQuantity: -item.quantity } },
-                { new: true, session },
+            const result = await Sale.create(
+                [{ customer: payload.customer, items: saleItems, grandTotal, createdBy }],
+                { session },
             );
-
-            if (!updated) {
-                throw new AppError(
-                    httpStatus.BAD_REQUEST,
-                    `Insufficient stock for "${product.name}" (stock changed concurrently)`,
-                );
-            }
-        }
-
-        const created = await Sale.create(
-            [{ customer: payload.customer, items: saleItems, grandTotal, createdBy }],
-            { session },
-        );
-
-        await session.commitTransaction();
-        return created[0];
-    } catch (error) {
-        await session.abortTransaction();
-        throw error;
+            created = result[0];
+        });
     } finally {
         session.endSession();
     }
+
+    // Return a populated document so the frontend gets product/customer details
+    // without a second round trip
+    return Sale.findById(created!._id)
+        .populate('customer')
+        .populate('items.product');
 };
 
 const getAllSales = async (query: Record<string, unknown>) => {
