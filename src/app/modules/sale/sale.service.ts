@@ -77,8 +77,6 @@ const createSale = async (payload: TCreateSalePayload, createdBy: string) => {
         session.endSession();
     }
 
-    // Return a populated document so the frontend gets product/customer details
-    // without a second round trip
     return Sale.findById(created!._id)
         .populate('customer')
         .populate('items.product');

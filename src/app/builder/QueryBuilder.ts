@@ -43,7 +43,7 @@ class QueryBuilder<T> {
     if (sortParam) {
       const sortObj: Record<string, 1 | -1> = {};
 
-      // Handle multiple sort fields
+      // Handle multiple sort field
       sortParam.split(',').forEach((field) => {
         if (field.startsWith('-')) {
           sortObj[field.substring(1)] = -1; // Descending

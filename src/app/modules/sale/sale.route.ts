@@ -7,8 +7,6 @@ import { USER_ROLE } from '../user/user.constant';
 
 const router = express.Router();
 
-// Admin: full access | Manager: create sales | Employee: create sales
-// (Manager and Employee both have "Create Sales" permission per the spec)
 router.post(
     '/',
     auth(USER_ROLE.admin, USER_ROLE.manager, USER_ROLE.employee),
@@ -16,8 +14,6 @@ router.post(
     SaleController.createSale,
 );
 
-// Sale history — admin/manager only makes sense for viewing all records;
-// adjust to include employee if they should see their own sales too.
 router.get(
     '/',
     auth(USER_ROLE.admin, USER_ROLE.manager),
