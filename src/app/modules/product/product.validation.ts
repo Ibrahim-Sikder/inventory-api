@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-// multipart/form-data sends everything as strings, so numeric fields
-// are coerced. Image itself is validated separately by the multer middleware.
 const createProductValidationSchema = z.object({
     body: z.object({
         name: z.string({ required_error: 'Product name is required' }),
