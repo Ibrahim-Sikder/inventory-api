@@ -4,13 +4,12 @@ import { ProductValidation } from './product.validation';
 import { validateRequest } from '../../middlewares/validateRequest';
 import { auth } from '../../middlewares/auth';
 import { upload } from '../../../utils/sendImageToCloudinary';
-import { USER_ROLE } from '../user/user.constant';
 
 const router = express.Router();
 
 router.post(
     '/',
-    auth('admin', 'manager', 'employee'),
+    auth('admin', 'manager',),
     upload,
     validateRequest(ProductValidation.createProductValidationSchema),
     ProductController.createProduct,
@@ -30,7 +29,7 @@ router.get(
 
 router.patch(
     '/:id',
-    auth('admin', 'manager', 'employee'),
+    auth('admin', 'manager'),
     upload,
     validateRequest(ProductValidation.updateProductValidationSchema),
     ProductController.updateProduct,
@@ -38,7 +37,7 @@ router.patch(
 
 router.delete(
     '/:id',
-    auth('admin', 'manager', 'employee'),
+    auth('admin', 'manager',),
     ProductController.deleteProduct,
 );
 

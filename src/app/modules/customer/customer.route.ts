@@ -3,22 +3,20 @@ import { CustomerController } from './customer.controller';
 import { CustomerValidation } from './customer.validation';
 import { validateRequest } from '../../middlewares/validateRequest';
 import { auth } from '../../middlewares/auth';
-import { USER_ROLE } from '../user/user.constant';
 
 const router = express.Router();
 
-// Admin: full access | Manager: manage customers
-// Employee: read-only (needed to pick a customer on the Create Sale page)
+
 router.post(
     '/',
-    auth(USER_ROLE.admin, USER_ROLE.manager),
+    auth('admin', 'manager'),
     validateRequest(CustomerValidation.createCustomerValidationSchema),
     CustomerController.createCustomer,
 );
 
 router.get(
     '/',
-    auth(USER_ROLE.admin, USER_ROLE.manager, USER_ROLE.employee),
+    auth('admin', 'manager', 'employee'),
     CustomerController.getAllCustomers,
 );
 
