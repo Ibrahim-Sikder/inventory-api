@@ -10,15 +10,15 @@ This repository contains the **backend only**. The API is built with Node.js, Ex
 
 | Resource | URL |
 |---|---|
-| Live Backend API | `<ADD_YOUR_LIVE_BACKEND_URL>/api/v1` |
-| Backend GitHub Repository | `<ADD_YOUR_BACKEND_REPO_URL>` |
+| Live Backend API | `https://erpapi.softypy.com/>/api/v1` |
+| Backend GitHub Repository | `https://github.com/Ibrahim-Sikder/inventory-api` |
 
 ## 🔑 Admin Login Credentials
 
 | Field | Value |
 |---|---|
 | Email | `admin@gmail.com` |
-| Password | `<ADD_ADMIN_PASSWORD>` |
+| Password | `123456` |
 | Role | `admin` |
 
 > ⚠️ These are demo credentials provided solely for evaluation purposes.
@@ -37,7 +37,7 @@ This repository contains the **backend only**. The API is built with Node.js, Ex
 - **Caching / Queues:** Redis (ioredis), BullMQ
 - **Scheduling:** node-cron
 - **Logging:** Morgan
-- **Other:** slugify, nanoid, date-fns, moment, nodemailer, ejs
+- **Other:** slugify, date-fns, nodemailer
 
 ---
 
@@ -139,7 +139,7 @@ src/
 ### 1. Clone the repository
 
 ```bash
-git clone <ADD_YOUR_BACKEND_REPO_URL> inventory-api
+git clone <https://github.com/Ibrahim-Sikder/inventory-api> inventory-api
 cd inventory-api
 ```
 
@@ -155,7 +155,7 @@ Create a `.env` file in the project root (copy `.env.example` if present) with t
 
 ```env
 NODE_ENV=development
-PORT=9005
+PORT=9007
 
 DATABASE_URL=<ADD_YOUR_MONGODB_CONNECTION_STRING>
 DB_NAME=ERP
@@ -210,8 +210,8 @@ npm run prettier:write
 
 ## 📡 API Overview
 
-Base URL (local): `http://localhost:9005/api/v1`
-Base URL (production): `<ADD_YOUR_LIVE_BACKEND_URL>/api/v1`
+Base URL (local): `http://localhost:9007/api/v1`
+Base URL (production): `https://erpapi.softypy.com//api/v1`
 
 Full endpoint-by-endpoint documentation with request/response samples is in **[API_DOCUMENTATION.md](./API_DOCUMENTATION.md)**.
 
@@ -260,7 +260,6 @@ A ready-to-import Postman collection is included: **`ERP-Backend.postman_collect
 - [x] Reusable utilities (`catchAsync`, `sendResponse`, `ApiError`)
 - [ ] Dynamic Role & Permission Management (database-driven)
 - [ ] Generic Query Builder (search, filter, sort, pagination)
-- [ ] Socket.io / WebSocket real-time updates
 
 > Update this checklist to reflect what you actually implemented before submitting.
 
