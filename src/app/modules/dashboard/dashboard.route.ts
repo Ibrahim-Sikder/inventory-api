@@ -5,7 +5,7 @@ import { auth } from '../../middlewares/auth';
 const router = express.Router();
 router.get(
     '/stats',
-    auth('admin'),
+    auth('admin', 'employee', 'manager'),
     DashboardController.getDashboardStats,
 );
 
